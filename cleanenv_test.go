@@ -327,7 +327,8 @@ func TestReadEnvVarsURL(t *testing.T) {
 	}
 
 	type WithURL struct {
-		DatabaseURL url.URL `env:"DB_URL"`
+		DatabaseURL         url.URL `env:"DB_URL"`
+		DatabaseURLAsString URL     `env:"DB_URL2"`
 	}
 
 	tests := []struct {
@@ -351,11 +352,33 @@ func TestReadEnvVarsURL(t *testing.T) {
 		{
 			name: "time",
 			env: map[string]string{
+				"DB_URL2": "://:password@invalid-url:port/db-name",
+			},
+			cfg: &WithURL{},
+			want: &WithURL{
+				DatabaseURLAsString: URL{""},
+			},
+			wantErr: true,
+		},
+		{
+			name: "time",
+			env: map[string]string{
 				"DB_URL": "postgres://user:password@host:1234/db-name",
 			},
 			cfg: &WithURL{},
 			want: &WithURL{
 				DatabaseURL: urlFunc("postgres://user:password@host:1234/db-name"),
+			},
+			wantErr: false,
+		},
+		{
+			name: "time",
+			env: map[string]string{
+				"DB_URL2": "postgres://user:password@host:1234/db-name",
+			},
+			cfg: &WithURL{},
+			want: &WithURL{
+				DatabaseURLAsString: URL{"postgres://user:password@host:1234/db-name"},
 			},
 			wantErr: false,
 		},

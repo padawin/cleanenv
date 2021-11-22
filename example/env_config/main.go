@@ -14,6 +14,7 @@ type config struct {
 	Port      string        `env:"PORT"`
 	JWTSecret string        `env:"JWT_SECRET"`
 	DB        url.URL       `env:"DB"`
+	DB1       cleanenv.URL  `env:"DB"`
 	Start     time.Time     `env:"START"`
 	TTL       time.Duration `env:"TTL" env-required:"true"`
 }
@@ -32,6 +33,8 @@ func main() {
 
 	log.Println("Parsed Configuration")
 	log.Println(cfg)
+	var myDB string
+	myDB = cfg.DB1.string
 	return
 }
 
@@ -57,6 +60,11 @@ func setEnvValues() error {
 	}
 
 	err = os.Setenv("DB", "redis://user:password@redishost:1234")
+	if err != nil {
+		return fmt.Errorf("Error setting URL, err = %v", err)
+	}
+
+	err = os.Setenv("DB1", "redis://user:password@redishost:1234")
 	if err != nil {
 		return fmt.Errorf("Error setting URL, err = %v", err)
 	}

@@ -67,6 +67,10 @@ type Updater interface {
 	Update() error
 }
 
+type URL struct {
+	string
+}
+
 // ReadConfig reads configuration file and parses it depending on tags in structure provided.
 // Then it reads and parses
 //
@@ -226,6 +230,14 @@ var validStructs = map[reflect.Type]parseFunc{
 			return err
 		}
 		field.Set(reflect.ValueOf(*val))
+		return nil
+	},
+	reflect.TypeOf(URL{}): func(field *reflect.Value, value string, _ *string) error {
+		val, err := url.Parse(value)
+		if err != nil {
+			return err
+		}
+		field.Set(reflect.ValueOf(URL{val.String()}))
 		return nil
 	},
 }
